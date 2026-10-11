@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For U ❤️</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #050004;
+    font-family: Arial, sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+}
+
+.container {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+h1 {
+    color: #ff416f;
+    font-size: clamp(24px, 3vw, 38px);
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 15px #ff174f;
+    margin-bottom: 8px;
+    animation: fadeIn 2s ease both;
+}
+
+.subtitle {
+    color: #ffb1c5;
+    font-size: 13px;
+    letter-spacing: 3px;
+    margin-bottom: 8px;
+    opacity: 0.8;
+}
+
+canvas {
+    width: min(92vw, 850px);
+    height: min(75vh, 650px);
+    display: block;
+}
+
+.footer {
+    color: #ff8ba8;
+    font-size: 12px;
+    letter-spacing: 3px;
+    margin-top: 20px;
+    opacity: 0.8;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-height: 600px) {
+    canvas {
+        height: 68vh;
+    }
+
+    h1 {
+        font-size: 22px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+    <h1>For Y💗U</h1>
+    <p class="subtitle">A LITTLE HEART MADE OF YOU BY ME </p>
+
+    <canvas id="heartCanvas"></canvas>
+
+    <p class="footer">MADE WITH CARE ♥</p>
+</div>
+
+<script>
+const canvas = document.getElementById("heartCanvas");
+const ctx = canvas.getContext("2d");
+
+let width, height;
+let particles = [];
+let startTime = performance.now();
+
+function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+
+    width = rect.width;
+    height = rect.height;
+
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+    createHeart();
+}
+
+function heartPoint(t) {
+    return {
+        x: 16 * Math.pow(Math.sin(t), 3),
+        y: 13 * Math.cos(t)
+            - 5 * Math.cos(2 * t)
+            - 2 * Math.cos(3 * t)
+            - Math.cos(4 * t)
+    };
+}
+
+function createHeart() {
+    particles = [];
+
+    const scale = Math.min(width / 38, height / 34);
+    const centerX = width / 2;
+    const centerY = height / 2 + scale * 1.3;
+
+    // Sirf heart ki boundary par naam likhenge
+    const total = 110;
+    const spacing = Math.max(12, scale * 0.8);
+
+    for (let i = 0; i < total; i++) {
+        const t = (i / total) * Math.PI * 2;
+        const p = heartPoint(t);
+
+        const x = centerX + p.x * scale;
+        const y = centerY - p.y * scale;
+
+        particles.push({
+            x,
+            y,
+            delay: i * 0.025,
+            size: Math.max(11, Math.min(16, scale * 0.85)),
+            phase: Math.random() * Math.PI * 2
+        });
+    }
+}
+
+ 
+
+
+
+function animate(now) {
+    ctx.clearRect(0, 0, width, height);
+
+    const elapsed = (now - startTime) / 1000;
+
+    const gradient = ctx.createRadialGradient(
+        width / 2, height / 2, 5,
+        width / 2, height / 2, width * 0.48
+    );
+
+    gradient.addColorStop(0, "rgba(90, 0, 28, 0.15)");
+    gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, width, height);
+
+    const revealDuration = 4.5;
+
+    particles.forEach((p, i) => {
+        const progress = Math.min(
+            1,
+            Math.max(0, (elapsed - p.delay) / revealDuration)
+        );
+
+        if (progress <= 0) return;
+
+        const pulse = 0.78 + 0.22 *
+            Math.sin(elapsed * 2.4 + p.phase);
+
+        ctx.save();
+
+        ctx.globalAlpha = progress * pulse;
+        ctx.font = `bold ${p.size}px Arial`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        ctx.shadowColor = "#ff174f";
+        ctx.shadowBlur = 10;
+
+        const textGradient = ctx.createLinearGradient(
+            p.x - 35, p.y, p.x + 35, p.y
+        );
+
+        textGradient.addColorStop(0, "#ff668a");
+        textGradient.addColorStop(0.5, "#ffffff");
+        textGradient.addColorStop(1, "#ff174f");
+
+        ctx.fillStyle = textGradient;
+        ctx.fillText("best BhaBhi", p.x, p.y);
+
+        ctx.restore();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener("resize", resizeCanvas);
+
+resizeCanvas();
+requestAnimationFrame(animate);
+</script>
+
+</body>
+</html>
+
+ 
